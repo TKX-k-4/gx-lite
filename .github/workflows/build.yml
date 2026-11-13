@@ -30,16 +30,8 @@ jobs:
 
       - run: npm install
 
-      - name: Build and publish on version tags
-        shell: bash
-        run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            npx electron-builder --publish always
-          else
-            npx electron-builder --publish never
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build installers
+        run: npx electron-builder --publish never
 
       - name: Save installers as workflow artifacts
         uses: actions/upload-artifact@v4
@@ -47,5 +39,14 @@ jobs:
           name: gx-lite-${{ matrix.os }}
           if-no-files-found: error
           path: |
+            gx-lite/dist/*.exe
+            gx-lite/dist/*.dmg
+
+      - name: Attach installers to release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
             gx-lite/dist/*.exe
             gx-lite/dist/*.dmg
