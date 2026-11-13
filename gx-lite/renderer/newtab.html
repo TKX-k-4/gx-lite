@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>New Tab</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body data-wp="default">
+<div id="bg"></div>
+<div class="nt">
+  <div id="clock"></div>
+  <div id="date"></div>
+  <form id="sf"><input id="q" placeholder="Search Google or type a URL" autocomplete="off" spellcheck="false"></form>
+  <div id="dial"></div>
+</div>
+<button id="cust-btn">Customize</button>
+<aside id="cust" hidden>
+  <div><div class="lbl">Wallpaper</div>
+    <div class="sw-row" id="sw">
+      <div class="sw" data-wp="default" title="Default"></div><div class="sw" data-wp="ocean" title="Ocean"></div>
+      <div class="sw" data-wp="void" title="Void"></div><div class="sw" data-wp="mono" title="Graphite"></div>
+    </div>
+  </div>
+  <div class="row"><span>Your own image</span><button class="btn" id="upload">Choose…</button><input type="file" id="file" accept="image/*" hidden></div>
+  <div class="row"><span>Accent colour</span><input type="color" id="accent"></div>
+  <div class="row"><span>Clock</span><input type="checkbox" class="tg" id="t-clock"></div>
+  <div class="row"><span>Bookmark tiles</span><input type="checkbox" class="tg" id="t-dial"></div>
+  <div class="row"><span>Bookmarks bar</span><input type="checkbox" class="tg" id="t-bar"></div>
+  <div class="msg" id="msg"></div>
+</aside>
+<script src="newtab.js"></script>
+</body>
+</html>

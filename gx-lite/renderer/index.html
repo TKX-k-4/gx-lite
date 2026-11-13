@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>GX Lite</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+<header id="topbar">
+  <div id="lights"></div>
+  <div id="tabs"></div>
+  <button class="icon-btn" id="btn-newtab" title="New tab"></button>
+  <button class="icon-btn" id="btn-tabsearch" title="Search tabs"></button>
+  <div id="drag"></div>
+  <div id="winctl"></div>
+</header>
+<div id="body">
+  <aside id="sidebar">
+    <div id="ws"></div>
+    <div class="sep"></div>
+    <div id="apps"></div>
+    <div class="grow"></div>
+    <button class="sb-btn" id="btn-console" title="Console"></button>
+    <button class="sb-btn" id="btn-sbsettings" title="Sidebar settings"></button>
+    <button class="sb-btn" id="btn-settings" title="Settings"></button>
+  </aside>
+  <main id="main">
+    <div id="toolbar">
+      <button class="icon-btn" id="btn-back" title="Back"></button>
+      <button class="icon-btn" id="btn-fwd" title="Forward"></button>
+      <button class="icon-btn" id="btn-reload" title="Reload"></button>
+      <div id="omnibox">
+        <span id="chip" hidden>✦ Gemini</span>
+        <input id="addr" spellcheck="false" autocomplete="off" placeholder="Search Google or type a URL">
+        <button class="icon-btn" id="btn-shield" title="Ad blocker"></button>
+        <button class="icon-btn" id="btn-star" title="Bookmark this page"></button>
+      </div>
+      <button id="btn-update" hidden></button>
+    </div>
+    <div id="bookmarks"></div>
+    <div id="findbar" hidden>
+      <input id="find-input" placeholder="Find in page" spellcheck="false">
+      <span id="find-count"></span>
+      <button class="icon-btn" id="find-prev" title="Previous"></button>
+      <button class="icon-btn" id="find-next" title="Next"></button>
+      <button class="icon-btn" id="find-close" title="Close"></button>
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
+<div id="tabsearch" hidden>
+  <div class="ts-box">
+    <input id="ts-input" placeholder="Search open tabs" spellcheck="false" autocomplete="off">
+    <div id="ts-list"></div>
+  </div>
+</div>
+<script src="ui.js"></script>
+</body>
+</html>

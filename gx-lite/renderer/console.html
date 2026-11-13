@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Console</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="con">
+<header>
+  <strong>Console</strong>
+  <button class="chip on" data-f="all">All</button>
+  <button class="chip" data-f="warn">Warnings</button>
+  <button class="chip" data-f="error">Errors</button>
+  <button class="chip" id="copy">Copy</button>
+  <button class="chip" id="clear">Clear</button>
+</header>
+<div id="out" role="log"></div>
+<script src="console.js"></script>
+</body>
+</html>

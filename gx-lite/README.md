@@ -1,0 +1,46 @@
+# GX Lite
+
+Small Chromium-based browser (Electron) with a GX-style sidebar, 4 workspaces, tab groups, tab search, find-in-page, bookmarks and a customizable new tab. No extension support.
+
+## Run
+```
+npm install
+npm start
+```
+
+## Package
+```
+npm run dist     # DMG on macOS, NSIS installer on Windows
+```
+Build each platform on its own OS. Code signing and notarization are needed before sharing builds.
+
+## Shortcuts
+| Action | Windows | macOS |
+|---|---|---|
+| New / close / reopen tab | Ctrl+T / W / Shift+T | Cmd+T / W / Shift+T |
+| Find in page | Ctrl+F | Cmd+F |
+| Search tabs | Ctrl+Shift+A | Cmd+Shift+A |
+| Address bar | Ctrl+L | Cmd+L |
+| Workspace 1-4 | Ctrl+Alt+1-4 | Cmd+Opt+1-4 |
+| Ask Gemini | type, press Tab, then Enter | same |
+| Back / forward | Alt+Left/Right, mouse 4/5 | Cmd+[ / ], mouse 4/5 |
+
+## Layout
+- `src/main.js`: window, tabs, workspaces, groups, sidebar panels, memory sweeper, IPC
+- `src/ui-preload.js`, `src/tab-preload.js`: bridges (tab preload also handles mouse 4/5 on macOS)
+- `renderer/`: browser chrome (`index.html`, `ui.css`, `ui.js`), new tab, settings
+
+## Build installers
+**On GitHub (both at once):** push this folder to a GitHub repo, open the Actions tab, choose "Build installers", click Run workflow. When it finishes, download the Windows `.exe` and the Mac `.dmg` files from the run's Artifacts.
+
+**On your own computer:** run `npm install` then `npm run dist`. A Mac produces the `.dmg` and a Windows PC produces the `.exe`. Results appear in the `dist` folder.
+
+Builds are unsigned: Windows shows a SmartScreen warning ("More info" > "Run anyway") and macOS needs right-click > Open the first time.
+
+## Auto-update
+1. In `package.json`, under `build.publish`, replace `YOUR-GITHUB-USERNAME` with your GitHub name (and `gx-lite` if your repo is named differently). The repo must be **public**, since the app checks it without a login.
+2. To ship a new version: raise `"version"` in `package.json` (for example 0.1.1), commit, then run `git tag v0.1.1` and `git push --tags`. GitHub builds both installers and publishes them as a Release.
+3. Installed copies check 10 seconds after launch and every 4 hours, plus File > Check for Updates.
+   - Windows: downloads in the background, shows a "Restart to update" button, and installs on the next quit regardless.
+   - Mac (unsigned): shows an "Update x.y.z" button that opens the download page. Silent updates need a signed app.
+Updates are skipped when running with `npm start`.
