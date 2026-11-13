@@ -12,6 +12,9 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: gx-lite
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
