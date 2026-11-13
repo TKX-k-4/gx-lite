@@ -53,7 +53,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "TKX_k_4",
+        "owner": "TKX-k-4",
         "repo": "gx-lite",
         "releaseType": "release"
       }
