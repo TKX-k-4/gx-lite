@@ -1,27 +1,36 @@
 name: Build installers
+
 on:
   workflow_dispatch:
   push:
     tags: ['v*']
+
 permissions:
   contents: write
+
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
+
     runs-on: ${{ matrix.os }}
+
     defaults:
       run:
         working-directory: gx-lite
+
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
+
       - run: npm install
-      - name: Build (publishes a GitHub Release when run from a version tag)
+
+      - name: Build (attaches installers to the release when run from a version tag)
         shell: bash
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
@@ -31,9 +40,11 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: gx-lite-${{ matrix.os }}
+          if-no-files-found: error
           path: |
             gx-lite/dist/*.exe
             gx-lite/dist/*.dmg
