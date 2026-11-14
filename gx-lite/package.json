@@ -1,7 +1,7 @@
 {
   "name": "gx-lite",
   "productName": "GX Lite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A small, fast, Chromium-based browser with a GX-style sidebar and workspaces.",
   "main": "src/main.js",
   "scripts": {
@@ -57,11 +57,18 @@
         "repo": "gx-lite",
         "releaseType": "release"
       }
-    ]
+    ],
+    "asarUnpack": [
+      "node_modules/node-pty/**"
+    ],
+    "npmRebuild": false
   },
   "dependencies": {
     "@fontsource-variable/source-code-pro": "^5.1.0",
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "node-pty": "^1.0.0",
+    "@xterm/xterm": "^5.5.0",
+    "@xterm/addon-fit": "^0.10.0"
   },
   "author": "GX Lite"
 }

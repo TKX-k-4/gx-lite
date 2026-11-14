@@ -14,7 +14,10 @@
     gear: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
     chevron: '<path d="M6 9l6 6 6-6"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-    terminal: '<path d="M4 17l6-6-6-6M12 19h8"/>'
+    terminal: '<path d="M4 17l6-6-6-6M12 19h8"/>',
+    cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
+    list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/>'
   };
   const svg = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
   const APPS = [
@@ -37,7 +40,7 @@
   const setIcon = (sel, n) => { $(sel).innerHTML = svg(n); };
   setIcon('#btn-newtab', 'plus'); setIcon('#btn-tabsearch', 'chevron');
   setIcon('#btn-back', 'back'); setIcon('#btn-fwd', 'fwd'); setIcon('#btn-star', 'star');
-  setIcon('#btn-sbsettings', 'sliders'); setIcon('#btn-console', 'terminal'); setIcon('#btn-shield', 'shield'); setIcon('#btn-settings', 'gear');
+  setIcon('#btn-sbsettings', 'sliders'); setIcon('#btn-console', 'list'); setIcon('#btn-terminal', 'terminal'); setIcon('#btn-memory', 'cpu'); setIcon('#btn-summarize', 'sparkle'); setIcon('#btn-shield', 'shield'); setIcon('#btn-settings', 'gear');
   setIcon('#find-prev', 'back'); setIcon('#find-next', 'fwd'); setIcon('#find-close', 'x');
   $('#find-prev').firstChild.style.transform = 'rotate(90deg)';
   $('#find-next').firstChild.style.transform = 'rotate(90deg)';
@@ -49,6 +52,8 @@
     if (!renaming && !dragging) renderTabs();
     renderWs(); renderApps(); renderToolbar(); renderBookmarks();
     $('#btn-console').classList.toggle('active', S.activePanel === 'console');
+    $('#btn-terminal').classList.toggle('active', S.activePanel === 'terminal');
+    $('#btn-memory').classList.toggle('active', S.activePanel === 'memory');
     renderUpdate();
   }
 
@@ -103,7 +108,7 @@
     $('#btn-reload').title = t?.loading ? 'Stop' : 'Reload';
     const switched = t?.id !== lastTabId;
     lastTabId = t?.id;
-    if (switched) { setMode(null); closeFind(); }
+    if (switched) { setMode(null); closeFind(); gx.omniClose(); }
     if (switched || document.activeElement !== addr) addr.value = t ? t.display : '';
     const blockOn = !!S.settings.adBlock, n = t?.blocked || 0;
     $('#btn-shield').classList.toggle('on', blockOn);
@@ -250,19 +255,37 @@
   $('#apps').addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) gx.togglePanel(b.dataset.app); });
   $('#btn-settings').onclick = () => gx.openSettings('');
   $('#btn-console').onclick = () => gx.togglePanel('console');
+  $('#btn-terminal').onclick = () => gx.togglePanel('terminal');
+  $('#btn-memory').onclick = () => gx.togglePanel('memory');
+  $('#btn-summarize').onclick = () => gx.summarize();
   $('#btn-shield').onclick = () => gx.toggleAdBlock();
   $('#btn-sbsettings').onclick = () => gx.openSettings('sidebar');
 
   // ---------- address bar ----------
   function setMode(m) { mode = m; $('#chip').hidden = !m; addr.placeholder = m ? 'Ask Gemini…' : 'Search Google or type a URL'; }
   addr.addEventListener('focus', () => addr.select());
+  // suggestions: typed text is sent to the main process, which shows them in a pop-up layer
+  let omniTimer = null;
+  addr.addEventListener('input', () => {
+    clearTimeout(omniTimer);
+    if (mode) { gx.omniClose(); return; }
+    omniTimer = setTimeout(() => {
+      const r = $('#omnibox').getBoundingClientRect();
+      gx.omniQuery(addr.value, { x: r.x, y: r.y, width: r.width, height: r.height });
+    }, 60);
+  });
+  addr.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== addr) gx.omniClose(); }, 200));
+  gx.onOmniFill((v) => { addr.value = v; addr.setSelectionRange(v.length, v.length); });
   addr.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); gx.omniMove(1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); gx.omniMove(-1); return; }
     if (e.key === 'Tab' && !e.shiftKey) {
       e.preventDefault();
       if (!mode) { if (addr.value === (cur()?.display ?? '')) addr.value = ''; setMode('gemini'); }
     } else if (e.key === 'Enter') {
       gx.go(addr.value, mode); setMode(null); addr.blur();
     } else if (e.key === 'Escape') {
+      gx.omniClose();
       if (mode) setMode(null); else { addr.value = cur()?.display ?? ''; addr.blur(); }
     } else if (e.key === 'Backspace' && mode && addr.value === '') setMode(null);
   });
@@ -325,6 +348,7 @@
     if (c === 'find') openFind();
     else if (c === 'tabsearch') openTS();
     else if (c === 'focus-address') { addr.focus(); addr.select(); }
+    else if (c === 'omni-commit') { addr.value = a; gx.go(a, null); setMode(null); addr.blur(); }
     else if (c === 'rename-group') setTimeout(() => { const chip = document.querySelector(`.group-chip[data-g="${a}"]`); if (chip) startRename(chip); }, 80);
   });
 

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Memory</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="con">
+<header>
+  <strong>Memory</strong>
+  <button class="chip" id="all" title="Frees the memory of every tab you are not looking at (audio tabs stay)">Unload background tabs</button>
+</header>
+<div class="mem-sum" id="sum"></div>
+<div id="list" class="mem-list"></div>
+<script src="memory.js"></script>
+</body>
+</html>

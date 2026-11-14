@@ -10,7 +10,7 @@ if (process.platform === 'darwin') {
 }
 
 // Only our own pages (new tab, settings) get an API.
-if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console)\.html$/.test(location.pathname)) {
+if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console|summary|terminal|memory)\.html$/.test(location.pathname)) {
   contextBridge.exposeInMainWorld('gx', {
     getBookmarks: () => ipcRenderer.invoke('bookmarks:get'),
     getSettings: () => ipcRenderer.invoke('settings:get'),
@@ -22,6 +22,24 @@ if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console)\.htm
     getLogs: () => ipcRenderer.invoke('console:get'),
     onLogs: (cb) => ipcRenderer.on('console:lines', (_e, l) => cb(l)),
     clearLogs: () => ipcRenderer.invoke('console:clear'),
+    getMemory: () => ipcRenderer.invoke('mem:get'),
+    unloadTab: (id) => ipcRenderer.send('mem:unload', id),
+    unloadPanel: (id) => ipcRenderer.send('mem:unload-panel', id),
+    unloadAll: () => ipcRenderer.send('mem:unload-all'),
+    getSummary: () => ipcRenderer.invoke('summary:get'),
+    onSummary: (cb) => ipcRenderer.on('summary:update', (_e, st) => cb(st)),
+    runSummary: () => ipcRenderer.send('summary:run'),
+    summaryViaClaude: () => ipcRenderer.send('summary:via-claude'),
+    closePanel: () => ipcRenderer.send('panel:close'),
+    aiStatus: () => ipcRenderer.invoke('ai:status'),
+    setApiKey: (k) => ipcRenderer.invoke('ai:set-key', k),
+    clearApiKey: () => ipcRenderer.invoke('ai:clear-key'),
+    ptyStart: (c, r) => ipcRenderer.invoke('pty:start', c, r),
+    ptyWrite: (d) => ipcRenderer.send('pty:write', d),
+    ptyResize: (c, r) => ipcRenderer.send('pty:resize', c, r),
+    ptyKill: () => ipcRenderer.invoke('pty:kill'),
+    onPtyData: (cb) => ipcRenderer.on('pty:data', (_e, d) => cb(d)),
+    onPtyExit: (cb) => ipcRenderer.on('pty:exit', (_e, c) => cb(c)),
     clearData: () => ipcRenderer.invoke('data:clear')
   });
 }

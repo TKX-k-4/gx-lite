@@ -26,8 +26,20 @@
     <div class="row"><span>Perplexity</span><input type="checkbox" class="tg" data-app="perplexity"></div>
     <div class="row"><span>GitHub</span><input type="checkbox" class="tg" data-app="github"></div>
   </section>
+  <section id="perf">
+    <h2>Performance</h2>
+    <div class="row"><div><div>Unload idle tabs after</div><div class="sub">Background tabs you have not looked at free their memory and reload when you click them. Tabs playing audio are never unloaded.</div></div><select id="unload" class="sel"><option value="1">1 minute</option><option value="2">2 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="0">Never</option></select></div>
+    <div class="row"><div><div>Low-memory mode (experimental)</div><div class="sub">Shares processes between tabs and turns on Chromium's low-end mode. Uses less memory but may feel less smooth. Restart the browser after changing it.</div></div><input type="checkbox" class="tg" id="lowmem"></div>
+  </section>
+  <section id="ai">
+    <h2>Page summarizer</h2>
+    <div class="row"><div><div>Anthropic API key</div><div class="sub" id="ai-status">Checking…</div><div class="sub">Page text is sent to Anthropic to write each summary. The key is stored encrypted on this computer.</div></div></div>
+    <div class="row"><input type="password" id="ai-key" class="txt" placeholder="sk-ant-..." autocomplete="off" spellcheck="false"><button class="btn" id="ai-save">Save</button><button class="btn" id="ai-clear">Remove</button></div>
+    <div class="row"><span>Model</span><select id="aiModel" class="sel"><option value="claude-haiku-5-5">Haiku 5.5 (fast, cheapest)</option><option value="claude-sonnet-5-5">Sonnet 5.5 (more detail)</option></select></div>
+  </section>
   <section>
     <h2>Privacy</h2>
+    <div class="row"><div><div>Search suggestions</div><div class="sub">Sends what you type in the address bar to Google to show suggestions.</div></div><input type="checkbox" class="tg" id="suggest"></div>
     <div class="row"><div><div>Clear browsing data</div><div class="sub">Signs you out of sites and removes cookies, storage and cache for tabs.</div></div><button class="btn" id="clear">Clear data</button></div>
     <div class="msg" id="msg" style="padding:0 0 12px"></div>
   </section>

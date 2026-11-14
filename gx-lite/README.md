@@ -44,3 +44,13 @@ Builds are unsigned: Windows shows a SmartScreen warning ("More info" > "Run any
    - Windows: downloads in the background, shows a "Restart to update" button, and installs on the next quit regardless.
    - Mac (unsigned): shows an "Update x.y.z" button that opens the download page. Silent updates need a signed app.
 Updates are skipped when running with `npm start`.
+
+## More features
+- **Address bar suggestions:** bookmarks, history and Google suggestions appear as you type (turn Google suggestions off in Settings > Privacy).
+- **Page summarizer:** sparkle button in the address bar (Ctrl/Cmd+Shift+Y). Needs your own Anthropic API key in Settings.
+- **Terminal:** sidebar button (Ctrl+`). Install opencode first with `npm i -g opencode-ai`, then press "Run opencode".
+
+## Performance
+- Idle tabs unload after 5 minutes by default (Settings > Performance; tabs playing audio are never unloaded).
+- Sidebar Memory button shows how much each tab and app uses, with an Unload button.
+- Low-memory mode (experimental, needs a restart) shares processes between tabs and enables Chromium's low-end mode.

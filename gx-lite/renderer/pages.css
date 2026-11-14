@@ -76,3 +76,26 @@ body[data-wp="mono"] #bg{background:#10141f}
 .sel{height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font:inherit;cursor:pointer}
 .sel:hover{border-color:var(--accent)}
 .tile .ti img.light{background:#e8eefc;border-radius:7px;padding:3px;box-sizing:content-box}
+
+.txt{flex:1;min-width:0;height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+.txt:focus{border-color:var(--accent);outline:0}
+.set .row:has(.txt){gap:10px;justify-content:flex-start}
+.sum{flex:1;overflow:auto;padding:16px;font-size:13px;line-height:1.6;user-select:text}
+.sum h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.sum .url{color:var(--dim);font-size:11.5px;word-break:break-all;margin-bottom:12px}
+.sum p{margin:0 0 10px}
+.sum ul{margin:0 0 12px;padding-left:20px}
+.sum li{margin-bottom:6px}
+.sum .dim{color:var(--dim)}
+.sum .err{color:#ff7b7b}
+#term{flex:1;min-height:0;padding:6px 0 0 8px;background:#080c16;overflow:hidden}
+
+.mem-sum{padding:10px 12px;color:var(--dim);font-size:12px;border-bottom:1px solid var(--line)}
+.mem-list{flex:1;overflow:auto}
+.mem-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.mem-row.off{opacity:.55}
+.mem-main{flex:1;min-width:0}
+.mem-name,.mem-sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mem-sub{color:var(--dim);font-size:11.5px;margin-top:2px}
+.mem-val{flex:none;font-variant-numeric:tabular-nums}
+.chip:disabled{opacity:.35;cursor:default;border-color:var(--line);color:var(--dim)}
