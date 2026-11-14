@@ -32,6 +32,10 @@
     <div class="row"><div><div>Unload idle tabs after</div><div class="sub">Background tabs you have not looked at free their memory and reload when you click them. Tabs playing audio are never unloaded.</div></div><select id="unload" class="sel"><option value="1">1 minute</option><option value="2">2 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="0">Never</option></select></div>
     <div class="row"><div><div>Low-memory mode (experimental)</div><div class="sub">Shares processes between tabs and turns on Chromium's low-end mode. Uses less memory but may feel less smooth. Restart the browser after changing it.</div></div><input type="checkbox" class="tg" id="lowmem"></div>
   </section>
+  <section id="terminal">
+    <h2>Terminal</h2>
+    <div class="row"><div><div>Start with opencode</div><div class="sub">Opens opencode when the terminal starts, and offers to install it if it is missing. Quit opencode to get a normal shell. Takes effect the next time the terminal starts (press Restart in it).</div></div><input type="checkbox" class="tg" id="termoc"></div>
+  </section>
   <section id="ai">
     <h2>Page summarizer</h2>
     <div class="row"><div><div>Anthropic API key</div><div class="sub" id="ai-status">Checking…</div><div class="sub">Page text is sent to Anthropic to write each summary. The key is stored encrypted on this computer.</div></div></div>

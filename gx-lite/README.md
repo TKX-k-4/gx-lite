@@ -54,3 +54,14 @@ Updates are skipped when running with `npm start`.
 - Idle tabs unload after 5 minutes by default (Settings > Performance; tabs playing audio are never unloaded).
 - Sidebar Memory button shows how much each tab and app uses, with an Unload button.
 - Low-memory mode (experimental, needs a restart) shares processes between tabs and enables Chromium's low-end mode.
+
+## Updates
+- Windows: downloads in the background (electron-updater), shows a "Restart now / Later" popup, and installs on quit. If electron-updater cannot read the release, GX Lite falls back to downloading the installer from the GitHub release and running it silently.
+- macOS: shows an update popup, downloads the .dmg, and a helper script replaces the app and relaunches it.
+- Releases must be named `vX.Y.Z`, match `"version"` in package.json, and have the .exe, .dmg, `latest.yml`, `latest-mac.yml` and `.blockmap` files attached.
+
+## Chromium plan
+`chromium-plan/` holds the plan and build scripts for the future "shave Chromium" browser. It is not part of the installer.
+
+## Terminal and opencode
+The terminal looks like macOS Terminal.app and starts `opencode` by default (scripts in the `opencode/` folder; turn it off in Settings > Terminal). If opencode is missing it offers to install it first.

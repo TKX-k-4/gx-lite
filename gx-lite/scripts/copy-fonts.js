@@ -27,6 +27,7 @@ try {
   fs.copyFileSync(nm('@xterm', 'xterm', 'lib', 'xterm.js'), out('vendor', 'xterm.js'));
   fs.copyFileSync(nm('@xterm', 'xterm', 'css', 'xterm.css'), out('vendor', 'xterm.css'));
   fs.copyFileSync(nm('@xterm', 'addon-fit', 'lib', 'addon-fit.js'), out('vendor', 'addon-fit.js'));
+  try { fs.copyFileSync(nm('@xterm', 'addon-unicode11', 'lib', 'addon-unicode11.js'), out('vendor', 'addon-unicode11.js')); } catch (e) { console.warn('[gx-lite] unicode11 addon not copied:', e.message); }
   console.log('[gx-lite] terminal files installed');
 } catch (e) {
   console.warn('[gx-lite] terminal files not copied:', e.message);

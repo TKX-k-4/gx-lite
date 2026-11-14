@@ -1,8 +1,10 @@
 'use strict';
-const { app, BrowserWindow, WebContentsView, ipcMain, Menu, session, shell, clipboard, net, screen, safeStorage } = require('electron');
+const { app, BrowserWindow, WebContentsView, ipcMain, Menu, session, shell, clipboard, net, screen, safeStorage, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
+const { spawn } = require('child_process');
+const crypto = require('crypto');
 
 // ---------- capture terminal output so the in-app Console can show it ----------
 const logBuf = [];
@@ -82,7 +84,7 @@ const APPS = {
 };
 
 const DEFAULT_SETTINGS = {
-  accent: '#3b82f6', wallpaper: 'default', wallpaperImage: '', adBlock: true, panelMode: 'split', searchSuggest: true, aiModel: 'claude-haiku-5-5', unloadMinutes: 5, lowMemory: false,
+  accent: '#3b82f6', wallpaper: 'default', wallpaperImage: '', adBlock: true, panelMode: 'split', searchSuggest: true, aiModel: 'claude-haiku-5-5', unloadMinutes: 5, lowMemory: false, terminalOpencode: true,
   showClock: true, showSpeedDial: true, showBookmarksBar: true,
   sidebarApps: { discord: true, youtube: true, wikipedia: true, claude: true, perplexity: true, github: true, spotify: true }
 };
@@ -1035,16 +1037,32 @@ ipcMain.handle('ai:clear-key', (e) => { if (isInternal(e)) { delete secretsStore
 // ---------- built-in terminal (run opencode or anything else) ----------
 const isTerminal = (e) => (e.senderFrame?.url || '').endsWith('/terminal.html');
 const termWc = () => { const p = panels.terminal; return p && !p.view.webContents.isDestroyed() ? p.view.webContents : null; };
+const opencodeDir = () => (app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'opencode') : path.join(__dirname, '..', 'opencode'));
+const shq = (str) => "'" + String(str).replace(/'/g, "'\\''") + "'";
 function ptyStart(cols, rows) {
   if (ptyProc) { try { ptyProc.resize(cols, rows); } catch {} return { ok: true, replay: ptyBuf }; }
   let pty;
   try { pty = require('node-pty'); } catch (e) { return { ok: false, error: 'node-pty is not installed (' + e.message + ')' }; }
   const win32 = process.platform === 'win32';
+  const home = app.getPath('home');
   const shell = win32 ? 'powershell.exe' : (process.env.SHELL || '/bin/zsh');
-  const args = win32 ? ['-NoLogo', '-ExecutionPolicy', 'Bypass'] : ['-l'];
+  // Start with opencode (via the scripts in the opencode folder), then fall back to a normal shell when it exits.
+  const script = path.join(opencodeDir(), win32 ? 'bootstrap.ps1' : 'bootstrap.sh');
+  const withOpencode = settings().terminalOpencode !== false && fs.existsSync(script);
+  let args;
+  if (win32) args = withOpencode ? ['-NoLogo', '-ExecutionPolicy', 'Bypass', '-NoExit', '-File', script] : ['-NoLogo', '-ExecutionPolicy', 'Bypass'];
+  else args = withOpencode ? ['-l', '-i', '-c', `bash ${shq(script)}; exec ${shq(shell)} -l`] : ['-l'];
+  // Apps started from the dock/start menu get a short PATH, so add the usual places opencode lives.
+  const env = { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor', TERM_PROGRAM: 'GXLite' };
+  if (!win32) env.LANG = process.env.LANG || 'en_US.UTF-8';
+  const extra = win32
+    ? [path.join(process.env.APPDATA || '', 'npm'), path.join(home, 'scoop', 'shims'), path.join(process.env.ProgramData || '', 'chocolatey', 'bin'), path.join(home, '.opencode', 'bin')]
+    : [path.join(home, '.opencode', 'bin'), '/opt/homebrew/bin', '/usr/local/bin', path.join(home, '.local', 'bin')];
+  const pathKey = Object.keys(env).find((k) => k.toLowerCase() === 'path') || 'PATH';
+  env[pathKey] = [...extra, env[pathKey] || ''].join(path.delimiter);
   let proc;
   try {
-    proc = pty.spawn(shell, args, { name: 'xterm-256color', cols, rows, cwd: app.getPath('home'), env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' } });
+    proc = pty.spawn(shell, args, { name: 'xterm-256color', cols, rows, cwd: home, env });
   } catch (e) { return { ok: false, error: e.message }; }
   ptyProc = proc; ptyBuf = '';
   proc.onData((d) => { ptyBuf = (ptyBuf + d).slice(-200000); const w = termWc(); if (w) w.send('pty:data', d); });
@@ -1054,7 +1072,7 @@ function ptyStart(cols, rows) {
     console.log(`[terminal] shell exited (${exitCode})`);
     const w = termWc(); if (w) w.send('pty:exit', exitCode);
   });
-  console.log(`[terminal] started ${shell}`);
+  console.log(`[terminal] started ${shell}${withOpencode ? ' with opencode' : ''}`);
   return { ok: true, replay: '' };
 }
 ipcMain.handle('pty:start', (e, c, r) => (isTerminal(e) ? ptyStart(Math.max(2, c | 0 || 80), Math.max(2, r | 0 || 24)) : { ok: false, error: 'denied' }));
@@ -1138,36 +1156,165 @@ function initUpdater() {
   UPDATER.autoInstallOnAppQuit = true;     // installs on the next quit even if you ignore the button
   UPDATER.on('update-available', (i) => { userCheck = false; console.log(`[update] version ${i.version} found, downloading`); setUpdate({ state: 'downloading', version: i.version, percent: 0 }); });
   UPDATER.on('download-progress', (p) => { if (updateState?.state === 'downloading') { updateState = { ...updateState, percent: Math.round(p.percent) }; pushState(); } });
-  UPDATER.on('update-downloaded', (i) => { console.log(`[update] version ${i.version} ready to install`); setUpdate({ state: 'ready', version: i.version }); });
+  UPDATER.on('update-downloaded', (i) => { console.log(`[update] version ${i.version} ready to install`); setUpdate({ state: 'ready', version: i.version }); promptRestartWin(i.version); });
   UPDATER.on('update-not-available', () => { console.log('[update] already up to date'); if (userCheck) setUpdate({ state: 'none' }, 4000); userCheck = false; });
   UPDATER.on('error', (e) => { console.log('[update] error:', (e && e.message) || e); if (userCheck) setUpdate({ state: 'error' }, 4000); userCheck = false; });
   return UPDATER;
+}
+const MAC_HELPER = [
+  "#!/bin/bash",
+  "PID=\"$1\"; DMG=\"$2\"; APP=\"$3\"",
+  "LOG=\"$HOME/Library/Logs/gx-lite-update.log\"",
+  "exec >>\"$LOG\" 2>&1",
+  "echo \"=== $(date) updating $APP from $DMG\"",
+  "for i in $(seq 1 80); do kill -0 \"$PID\" 2>/dev/null || break; sleep 0.5; done",
+  "MNT=\"$(mktemp -d /tmp/gxlite-mnt.XXXXXX)\"",
+  "if ! hdiutil attach \"$DMG\" -nobrowse -noautoopen -quiet -mountpoint \"$MNT\"; then echo \"attach failed\"; open \"$APP\"; exit 1; fi",
+  "SRC=\"$(find \"$MNT\" -maxdepth 1 -name \"*.app\" | head -n 1)\"",
+  "if [ -z \"$SRC\" ]; then echo \"no app inside the dmg\"; hdiutil detach \"$MNT\" -quiet; open \"$APP\"; exit 1; fi",
+  "OLD=\"$APP.old\"",
+  "rm -rf \"$OLD\"",
+  "if ! mv \"$APP\" \"$OLD\"; then echo \"could not move the old app\"; hdiutil detach \"$MNT\" -quiet; open \"$APP\"; exit 1; fi",
+  "if ditto \"$SRC\" \"$APP\"; then",
+  "  rm -rf \"$OLD\"",
+  "  xattr -dr com.apple.quarantine \"$APP\" 2>/dev/null",
+  "  echo \"updated OK\"",
+  "else",
+  "  echo \"copy failed, restoring the old version\"",
+  "  rm -rf \"$APP\"; mv \"$OLD\" \"$APP\"",
+  "fi",
+  "hdiutil detach \"$MNT\" -quiet -force",
+  "rm -f \"$DMG\"",
+  "open \"$APP\""
+].join('\n');
+
+// ---- update popups + the macOS self-updater (download, unpack, overwrite, restart) ----
+let dialogShownFor = null;
+function showUpdateDialog({ message, detail, yes }) {
+  return dialog.showMessageBox(win, { type: 'info', title: 'GX Lite update', message, detail, buttons: [yes, 'Later'], defaultId: 0, cancelId: 1 }).then((r) => r.response === 0);
+}
+async function promptRestartWin(version) {
+  if (dialogShownFor === 'w' + version) return;
+  dialogShownFor = 'w' + version;
+  const yes = await showUpdateDialog({ message: `GX Lite ${version} is ready`, detail: 'The update is downloaded. Restart now to install it, or it will install the next time you quit.', yes: 'Restart now' });
+  if (yes && UPDATER) UPDATER.quitAndInstall(true, true);
+}
+async function downloadTo(url, file, size, digest, onProgress) {
+  const res = await net.fetch(url);
+  if (!res.ok) throw new Error('Download failed (status ' + res.status + ')');
+  const total = Number(res.headers.get('content-length')) || size || 0;
+  const hash = crypto.createHash('sha256');
+  const out = fs.createWriteStream(file);
+  let got = 0;
+  const reader = res.body.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    hash.update(value); got += value.length;
+    if (!out.write(value)) await new Promise((r) => out.once('drain', r));
+    onProgress(total ? Math.round((got / total) * 100) : 0);
+  }
+  await new Promise((r) => out.end(r));
+  if (size && got !== size) throw new Error('The downloaded file is the wrong size');
+  if (digest && digest.startsWith('sha256:') && hash.digest('hex') !== digest.slice(7)) throw new Error('The downloaded file failed its checksum');
+}
+async function startMacUpdate() {
+  const u = updateState;
+  if (!u || u.state !== 'available') return;
+  const bundle = path.resolve(app.getPath('exe'), '..', '..', '..');
+  let writable = false;
+  try { fs.accessSync(path.dirname(bundle), fs.constants.W_OK); fs.accessSync(bundle, fs.constants.W_OK); writable = true; } catch {}
+  if (!bundle.endsWith('.app') || bundle.includes('/AppTranslocation/') || !writable || !u.asset) {
+    setUpdate({ state: 'manual', version: u.version, url: u.url });
+    dialog.showMessageBox(win, { type: 'info', title: 'GX Lite update', message: 'GX Lite cannot replace itself from here', detail: 'Drag GX Lite into your Applications folder and open it from there, or install the new version by hand. The download page will open now.', buttons: ['OK'] });
+    shell.openExternal(u.url);
+    return;
+  }
+  const dmg = path.join(app.getPath('temp'), u.asset.name);
+  setUpdate({ state: 'downloading', version: u.version, percent: 0 });
+  try {
+    let last = -1;
+    await downloadTo(u.asset.url, dmg, u.asset.size, u.asset.digest, (p) => { if (p !== last) { last = p; updateState = { ...updateState, percent: p }; pushState(); } });
+  } catch (e) {
+    console.log('[update] download failed:', e.message);
+    setUpdate({ state: 'error' }, 5000);
+    dialog.showMessageBox(win, { type: 'error', title: 'GX Lite update', message: 'The update could not be downloaded', detail: e.message, buttons: ['OK'] });
+    return;
+  }
+  const script = path.join(app.getPath('temp'), 'gx-lite-update.sh');
+  fs.writeFileSync(script, MAC_HELPER, { mode: 0o755 });
+  console.log(`[update] helper started for ${u.version}; quitting so it can replace the app`);
+  spawn('/bin/bash', [script, String(process.pid), dmg, bundle], { detached: true, stdio: 'ignore' }).unref();
+  setUpdate({ state: 'installing', version: u.version });
+  setTimeout(() => app.quit(), 400);
+}
+async function startWinUpdate() {
+  const u = updateState;
+  if (!u || u.state !== 'available') return;
+  if (!u.asset) { setUpdate({ state: 'manual', version: u.version, url: u.url }); shell.openExternal(u.url); return; }
+  const exe = path.join(app.getPath('temp'), u.asset.name);
+  setUpdate({ state: 'downloading', version: u.version, percent: 0 });
+  try {
+    let last = -1;
+    await downloadTo(u.asset.url, exe, u.asset.size, u.asset.digest, (p) => { if (p !== last) { last = p; updateState = { ...updateState, percent: p }; pushState(); } });
+  } catch (e) {
+    console.log('[update] download failed:', e.message);
+    setUpdate({ state: 'error' }, 5000);
+    dialog.showMessageBox(win, { type: 'error', title: 'GX Lite update', message: 'The update could not be downloaded', detail: e.message, buttons: ['OK'] });
+    return;
+  }
+  console.log(`[update] running the ${u.version} installer after GX Lite quits`);
+  app.once('quit', () => { try { spawn(exe, ['/S', '--updated', '--force-run'], { detached: true, stdio: 'ignore' }).unref(); } catch {} });
+  setUpdate({ state: 'installing', version: u.version });
+  setTimeout(() => app.quit(), 400);
 }
 async function checkManual(cfg, userInitiated) {
   const r = await net.fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } });
   if (!r.ok) throw new Error('GitHub answered ' + r.status);
   const j = await r.json();
   const v = String(j.tag_name || '').replace(/^v/, '');
-  if (v && isNewer(v, app.getVersion())) { console.log(`[update] version ${v} available`); setUpdate({ state: 'manual', version: v, url: j.html_url }); }
-  else { console.log('[update] already up to date'); if (userInitiated) setUpdate({ state: 'none' }, 4000); }
+  if (!(v && isNewer(v, app.getVersion()))) { console.log('[update] already up to date'); if (userInitiated) setUpdate({ state: 'none' }, 4000); return; }
+  console.log(`[update] version ${v} available`);
+  const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
+  const assets = j.assets || [];
+  const macAsset = assets.find((x) => x.name.endsWith(`-mac-${arch}.dmg`)) || assets.find((x) => x.name.endsWith('.dmg') && x.name.includes(arch));
+  const winAsset = assets.find((x) => x.name.endsWith('-win-x64.exe')) || assets.find((x) => x.name.endsWith('.exe'));
+  const a = process.platform === 'win32' ? winAsset : macAsset;
+  const st = { state: 'available', version: v, url: j.html_url, notes: String(j.body || '').slice(0, 600), asset: a ? { name: a.name, url: a.browser_download_url, size: a.size, digest: a.digest || '' } : null };
+  setUpdate(st);
+  if ((process.platform === 'darwin' || process.platform === 'win32') && (userInitiated || dialogShownFor !== 'm' + v)) {
+    dialogShownFor = 'm' + v;
+    const yes = await showUpdateDialog({ message: `GX Lite ${v} is available`, detail: `You have ${app.getVersion()}.${st.notes ? '\n\n' + st.notes : ''}`, yes: 'Update now' });
+    if (yes) { if (process.platform === 'win32') startWinUpdate(); else startMacUpdate(); }
+  }
 }
 async function checkForUpdates(userInitiated = false) {
   if (!app.isPackaged) { console.log('[update] skipped (development build)'); if (userInitiated) setUpdate({ state: 'none' }, 4000); return; }
   const cfg = updateConfig();
   if (!cfg) { console.log('[update] set your GitHub owner and repo in package.json (build.publish) first'); if (userInitiated) setUpdate({ state: 'error' }, 4000); return; }
-  if (updateState && ['downloading', 'ready'].includes(updateState.state)) return;
+  if (updateState && ['downloading', 'ready', 'installing'].includes(updateState.state)) return;
   if (userInitiated) { userCheck = true; setUpdate({ state: 'checking' }); }
   try {
     const u = initUpdater();
-    if (u) await u.checkForUpdates();
-    else await checkManual(cfg, userInitiated);
+    if (u) {
+      try { await u.checkForUpdates(); }
+      catch (e) {
+        // electron-updater could not read the release (for example latest.yml is missing): ask GitHub directly instead
+        console.log('[update] updater failed, checking the GitHub release directly:', e.message);
+        userCheck = false;
+        await checkManual(cfg, userInitiated);
+      }
+    } else await checkManual(cfg, userInitiated);
   } catch (e) {
     console.log('[update] check failed:', e.message);
     if (userInitiated) setUpdate({ state: 'error' }, 4000);
     userCheck = false;
   }
 }
-ipcMain.on('update:install', () => { if (UPDATER && updateState?.state === 'ready') UPDATER.quitAndInstall(true, true); });
+ipcMain.on('update:install', () => {
+  if (UPDATER && updateState?.state === 'ready') UPDATER.quitAndInstall(true, true);
+  else if (updateState?.state === 'available') { if (process.platform === 'darwin') startMacUpdate(); else if (process.platform === 'win32') startWinUpdate(); else if (updateState.url) shell.openExternal(updateState.url); }
+});
 ipcMain.on('update:open', () => { const u = updateState?.url; if (u && u.startsWith('https://github.com/')) shell.openExternal(u); });
 
 ipcMain.on('resize:start', () => {

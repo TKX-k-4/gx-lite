@@ -9,12 +9,14 @@
     $('#panelMode').value = S.panelMode || 'split';
     $('#suggest').checked = S.searchSuggest !== false;
     $('#unload').value = String(S.unloadMinutes ?? 5);
+    $('#termoc').checked = S.terminalOpencode !== false;
     $('#lowmem').checked = !!S.lowMemory;
     $('#aiModel').value = S.aiModel || 'claude-haiku-5-5';
     document.querySelectorAll('[data-app]').forEach((el) => { el.checked = !!(S.sidebarApps || {})[el.dataset.app]; });
   }
   $('#accent').addEventListener('input', (e) => window.gx.setSettings({ accent: e.target.value }));
   $('#panelMode').onchange = (e) => window.gx.setSettings({ panelMode: e.target.value });
+  $('#termoc').onchange = (e) => window.gx.setSettings({ terminalOpencode: e.target.checked });
   $('#unload').onchange = (e) => window.gx.setSettings({ unloadMinutes: +e.target.value });
   $('#lowmem').onchange = (e) => window.gx.setSettings({ lowMemory: e.target.checked });
   $('#suggest').onchange = (e) => window.gx.setSettings({ searchSuggest: e.target.checked });

@@ -6,17 +6,25 @@
 <title>Terminal</title>
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="vendor/xterm.css">
-<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="terminal.css">
 </head>
-<body class="con">
-<header>
-  <strong>Terminal</strong>
-  <button class="chip" id="opencode" title="Types opencode and presses Enter. Install it first with: npm i -g opencode-ai">Run opencode</button>
-  <button class="chip" id="restart">Restart</button>
-</header>
+<body>
+<div class="tb">
+  <div class="lights">
+    <button class="dot red" id="close" title="Close the terminal panel"></button>
+    <span class="dot yellow"></span>
+    <span class="dot green"></span>
+  </div>
+  <div class="ttl" id="ttl">Terminal</div>
+  <div class="acts">
+    <button id="opencode" title="Type opencode and press Enter">opencode</button>
+    <button id="restart" title="Start a fresh session">Restart</button>
+  </div>
+</div>
 <div id="term"></div>
 <script src="vendor/xterm.js"></script>
 <script src="vendor/addon-fit.js"></script>
+<script src="vendor/addon-unicode11.js"></script>
 <script src="terminal.js"></script>
 </body>
 </html>

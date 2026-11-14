@@ -1,0 +1,18 @@
+/* macOS Terminal.app look: dark title bar with traffic lights, black "Pro" profile, SF Mono / Menlo */
+html,body{margin:0;height:100%;overflow:hidden;background:#000}
+body{display:flex;flex-direction:column;font:13px -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;user-select:none}
+.tb{height:28px;flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 10px;background:linear-gradient(#3d3d3d,#2b2b2b);border-bottom:1px solid #000}
+.lights{display:flex;gap:8px;align-items:center}
+.dot{display:block;width:12px;height:12px;padding:0;border:0;border-radius:50%}
+.red{background:#ff5f57;cursor:pointer}
+.yellow{background:#febc2e}
+.green{background:#28c840}
+.red:hover{filter:brightness(.85)}
+.ttl{max-width:58vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#d6d6d6;font-weight:500}
+.acts{display:flex;justify-self:end;gap:4px}
+.acts button{padding:2px 8px;border:0;border-radius:5px;background:none;color:#a8a8a8;font:inherit;font-size:12px;cursor:pointer}
+.acts button:hover{background:rgba(255,255,255,.12);color:#fff}
+#term{flex:1;min-height:0;padding:6px 0 0 8px;background:#000;overflow:hidden}
+.xterm-viewport{background:#000!important}
+.xterm-viewport::-webkit-scrollbar{width:10px}
+.xterm-viewport::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28);border-radius:5px;border:2px solid #000}

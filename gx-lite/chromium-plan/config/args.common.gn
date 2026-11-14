@@ -1,0 +1,8 @@
+# Starting build settings. If `gn gen` says an argument "has no effect", delete that line (arguments change between versions).
+is_debug = false
+is_component_build = false
+symbol_level = 0
+blink_symbol_level = 0
+dcheck_always_on = false
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"

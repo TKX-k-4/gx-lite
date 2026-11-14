@@ -62,13 +62,13 @@
     const b = $('#btn-update'), u = S.update;
     b.hidden = !u;
     if (!u) return;
-    const label = { checking: 'Checking…', none: 'Up to date', error: 'Update check failed', downloading: `Updating ${u.percent || 0}%`, ready: 'Restart to update', manual: `Update ${u.version}` };
+    const label = { checking: 'Checking…', none: 'Up to date', error: 'Update check failed', downloading: `Updating ${u.percent || 0}%`, ready: 'Restart to update', available: `Update ${u.version}`, installing: 'Installing…', manual: `Update ${u.version}` };
     b.textContent = label[u.state] || '';
-    b.disabled = u.state === 'downloading' || u.state === 'checking';
-    b.className = ['ready', 'manual', 'downloading'].includes(u.state) ? 'hot' : '';
+    b.disabled = ['downloading', 'checking', 'installing'].includes(u.state);
+    b.className = ['ready', 'available', 'manual', 'downloading', 'installing'].includes(u.state) ? 'hot' : '';
     b.title = u.state === 'ready' ? `Version ${u.version} is downloaded. Click to restart and install` : u.state === 'manual' ? 'Open the download page' : '';
   }
-  $('#btn-update').onclick = () => { const u = S && S.update; if (u?.state === 'ready') gx.installUpdate(); else if (u?.state === 'manual') gx.openUpdate(); };
+  $('#btn-update').onclick = () => { const u = S && S.update; if (u?.state === 'ready' || u?.state === 'available') gx.installUpdate(); else if (u?.state === 'manual') gx.openUpdate(); };
 
   function textOn(hex) {
     const n = parseInt(hex.slice(1), 16);
