@@ -106,3 +106,10 @@ svg{width:16px;height:16px;display:block}
 #btn-update:disabled{opacity:.85;cursor:default}
 .app-icon.light{background:#e8eefc;padding:3px}
 .fav.light{background:#e8eefc;border-radius:50%;padding:1px}
+
+#btn-summarize{margin-left:6px;color:var(--accent)}
+#btn-summarize:hover{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+/* the sidebar now has many buttons: let it scroll instead of squashing them */
+#sidebar{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+#sidebar::-webkit-scrollbar{display:none}
+.sb-btn{flex:none}

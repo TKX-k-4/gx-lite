@@ -26,7 +26,8 @@
     { id: 'wikipedia', label: 'Wikipedia', glyph: 'W', color: '#d9d9de', dark: true },
     { id: 'claude', label: 'Claude', glyph: '✺', color: '#c8683f' },
     { id: 'perplexity', label: 'Perplexity', glyph: 'P', color: '#1fa6b8' },
-    { id: 'github', label: 'GitHub', glyph: 'G', color: '#2b3137', light: true }
+    { id: 'github', label: 'GitHub', glyph: 'G', color: '#2b3137', light: true },
+    { id: 'spotify', label: 'Spotify', glyph: '♪', color: '#1db954' }
   ];
 
   let S = null, mode = null, renaming = false, dragging = false, drag = null, suppressClick = false, lastChip = { gid: null, t: 0 }, lastTabId = null, tsIndex = 0, rzDrag = null;

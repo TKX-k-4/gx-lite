@@ -74,6 +74,7 @@ const APPS = {
   claude: 'https://claude.ai/',
   perplexity: 'https://www.perplexity.ai/',
   github: 'https://github.com/',
+  spotify: 'https://open.spotify.com/',
   console: CONSOLE_URL,
   terminal: TERMINAL_URL,
   summary: SUMMARY_URL,
@@ -83,7 +84,7 @@ const APPS = {
 const DEFAULT_SETTINGS = {
   accent: '#3b82f6', wallpaper: 'default', wallpaperImage: '', adBlock: true, panelMode: 'split', searchSuggest: true, aiModel: 'claude-haiku-5-5', unloadMinutes: 5, lowMemory: false,
   showClock: true, showSpeedDial: true, showBookmarksBar: true,
-  sidebarApps: { discord: true, youtube: true, wikipedia: true, claude: true, perplexity: true, github: true }
+  sidebarApps: { discord: true, youtube: true, wikipedia: true, claude: true, perplexity: true, github: true, spotify: true }
 };
 const DEFAULT_BOOKMARKS = { items: [
   { id: 'b1', title: 'YouTube', url: 'https://www.youtube.com/' },
@@ -92,7 +93,8 @@ const DEFAULT_BOOKMARKS = { items: [
   { id: 'b4', title: 'Perplexity', url: 'https://www.perplexity.ai/' },
   { id: 'b5', title: 'Discord', url: 'https://discord.com/app' },
   { id: 'b6', title: '3D Graphing Calculator', url: 'https://www.desmos.com/3d' },
-  { id: 'b7', title: 'GitHub', url: 'https://github.com/' }
+  { id: 'b7', title: 'GitHub', url: 'https://github.com/' },
+  { id: 'b8', title: 'Spotify', url: 'https://open.spotify.com/' }
 ] };
 
 // ---------- tiny JSON store ----------
@@ -184,7 +186,7 @@ function normalize(input) {
 }
 
 // ---------- sidebar app logos (fetched once, cached on disk) ----------
-const APP_DOMAINS = { discord: 'discord.com', youtube: 'youtube.com', wikipedia: 'wikipedia.org', claude: 'claude.ai', perplexity: 'perplexity.ai', github: 'github.com' };
+const APP_DOMAINS = { discord: 'discord.com', youtube: 'youtube.com', wikipedia: 'wikipedia.org', claude: 'claude.ai', perplexity: 'perplexity.ai', github: 'github.com', spotify: 'open.spotify.com' };
 async function fetchFavicon(domain) {
   try {
     const r = await net.fetch(`https://www.google.com/s2/favicons?domain=${domain}&sz=64`);
@@ -1198,11 +1200,12 @@ app.whenReady().then(() => {
   sd.sidebarApps = { ...DEFAULT_SETTINGS.sidebarApps, ...sd.sidebarApps };
   if (!sd.themeV) { sd.accent = DEFAULT_SETTINGS.accent; sd.wallpaper = DEFAULT_SETTINGS.wallpaper; sd.themeV = 2; settingsStore.save(); } // one-time move to the blue theme
   bmStore = makeStore('bookmarks', DEFAULT_BOOKMARKS);
-  if ((bmStore.data.bmV || 0) < 3) {
+  if ((bmStore.data.bmV || 0) < 4) {
     const have = (re) => bmStore.data.items.some((b) => re.test(b.url));
     if (!have(/desmos\.com\/3d/)) bmStore.data.items.push({ id: 'b6', title: '3D Graphing Calculator', url: 'https://www.desmos.com/3d' });
     if (!have(/github\.com/)) bmStore.data.items.push({ id: 'b7', title: 'GitHub', url: 'https://github.com/' });
-    bmStore.data.bmV = 3; bmStore.save();
+    if (!have(/spotify\.com/)) bmStore.data.items.push({ id: 'b8', title: 'Spotify', url: 'https://open.spotify.com/' });
+    bmStore.data.bmV = 4; bmStore.save();
   }
   iconStore = makeStore('appicons', { icons: {} });
   sessionStore = makeStore('session', {});
