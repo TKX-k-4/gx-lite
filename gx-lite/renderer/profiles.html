@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Profiles</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="pg">
+  <h1>Profiles</h1>
+  <section class="card">
+    <p class="sub">Each profile keeps its own Google and website logins, tabs, tab groups, bookmarks, history, passwords and settings on this computer. Opening a profile starts it in its own window. Profiles are not synced between computers.</p>
+    <div id="google" class="sub"></div>
+  </section>
+  <section class="card">
+    <h2>Your profiles</h2>
+    <div id="list"></div>
+  </section>
+  <section class="card">
+    <h2>Add a profile</h2>
+    <div class="bar">
+      <input id="name" class="txt" placeholder="Name, like Work" maxlength="30" autocomplete="off" spellcheck="false">
+      <div id="colors" class="swatches"></div>
+      <button class="btn primary" id="add">Add</button>
+      <span class="msg" id="msg"></span>
+    </div>
+  </section>
+</div>
+<script src="profiles.js"></script>
+</body>
+</html>

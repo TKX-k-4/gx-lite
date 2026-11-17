@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Extensions</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="pg">
+  <h1>Extensions</h1>
+  <p class="warn" id="warn" hidden>Extension support did not start. Run <b>npm install</b> in the project folder and restart GX Lite.</p>
+  <section class="card">
+    <p class="sub">Install extensions from the Chrome Web Store. GX Lite supports only part of Chrome's extension system, and it has no toolbar buttons for extensions yet, so use the Popup and Options buttons below. Extensions that run inside web pages (dark mode, ad blockers, page tools) are the most likely to work. Ones that need Chrome's toolbar, native apps or sign-in pop-ups may not.</p>
+    <div class="bar">
+      <button class="btn primary" id="store">Open the Chrome Web Store</button>
+    </div>
+    <div class="bar">
+      <input id="id" class="txt" placeholder="Or paste an extension ID or Web Store link" spellcheck="false" autocomplete="off">
+      <button class="btn" id="install">Install</button>
+      <span class="msg" id="msg"></span>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Installed</h2>
+    <div id="list"></div>
+  </section>
+</div>
+<script src="extensions.js"></script>
+</body>
+</html>

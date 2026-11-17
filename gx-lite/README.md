@@ -65,3 +65,24 @@ Updates are skipped when running with `npm start`.
 
 ## Terminal and opencode
 The terminal looks like macOS Terminal.app and starts `opencode` by default (scripts in the `opencode/` folder; turn it off in Settings > Terminal). If opencode is missing it offers to install it first.
+
+## Shaving the Chromium inside GX Lite
+- Settings > Performance: idle-tab unloading (default 5 min), freeze background tabs (experimental), low-memory mode (experimental, restart needed), spell check on/off.
+- Extra Chromium background features are switched off at start-up; the installer keeps only the English language files.
+- Measure with the sidebar Memory panel before and after each change.
+
+## Passwords, autofill and history
+- Passwords are encrypted with the OS key store (macOS Keychain, Windows data protection) in `vault.json`; the page never sees them until you click a saved login under a field.
+- Sidebar key button: password manager (add, edit, show/copy with confirmation, import/export CSV, never-save list, saved address info). Sidebar clock button (or Cmd+Y / Ctrl+H): history with search and clearing.
+- Not included: card numbers (deliberately), sync between devices, a master password.
+
+## Profiles, tab groups in the bookmarks bar, extensions
+- **Profiles:** the round button right of the AI summary button. Each profile has its own data folder (Google and site logins, tabs, tab groups, bookmarks, history, passwords, settings). Open one from the button's menu; it starts in its own window. Not synced between computers.
+- **Tab groups in the bookmarks bar:** every tab group shows as a chip. Filled = open, outlined = saved and closed. Click to jump to it or reopen it; right-click to close or delete.
+- **Extensions:** Chrome Web Store extensions via `electron-chrome-web-store` (MIT). Electron supports only part of Chrome's extension APIs, and there is no toolbar for extension buttons yet. The fuller `electron-chrome-extensions` package is GPL-3.0, so it is not used.
+
+## Extensions button, authenticator, default browser
+- **Puzzle button** (right of the AI summary button): opens a menu over the page listing your extensions. Click one to open its popup over the page, or choose Options. Popup support is partial because Electron only implements part of Chrome's extension APIs.
+- **Authenticator** (profile menu, View menu, Settings): 2-step verification codes (TOTP), encrypted like passwords, with autofill on code boxes.
+- **Default browser** (Settings): macOS asks you to confirm; on Windows the button opens Default apps and you pick GX Lite there.
+- Tools: `tools/measure-memory.*` adds up each browser's memory for fair comparisons.

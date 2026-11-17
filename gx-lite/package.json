@@ -1,7 +1,7 @@
 {
   "name": "gx-lite",
   "productName": "GX Lite",
-  "version": "0.1.10",
+  "version": "0.2.1",
   "description": "A small, fast, Chromium-based browser with a GX-style sidebar and workspaces.",
   "main": "src/main.js",
   "scripts": {
@@ -20,7 +20,8 @@
       "src/**",
       "renderer/**",
       "opencode/**",
-      "package.json"
+      "package.json",
+      "!**/*.map"
     ],
     "mac": {
       "target": [
@@ -34,7 +35,18 @@
       ],
       "minimumSystemVersion": "12.0",
       "category": "public.app-category.productivity",
-      "identity": null
+      "identity": null,
+      "extendInfo": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "Web link",
+            "CFBundleURLSchemes": [
+              "http",
+              "https"
+            ]
+          }
+        ]
+      }
     },
     "win": {
       "target": [
@@ -48,7 +60,8 @@
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": false
+      "perMachine": false,
+      "include": "build/installer.nsh"
     },
     "artifactName": "gx-lite-${version}-${os}-${arch}.${ext}",
     "publish": [
@@ -63,7 +76,11 @@
       "node_modules/node-pty/**",
       "opencode/**"
     ],
-    "npmRebuild": false
+    "npmRebuild": false,
+    "electronLanguages": [
+      "en-US"
+    ],
+    "compression": "maximum"
   },
   "dependencies": {
     "@fontsource-variable/source-code-pro": "^5.1.0",
@@ -71,7 +88,8 @@
     "node-pty": "^1.0.0",
     "@xterm/xterm": "^5.5.0",
     "@xterm/addon-fit": "^0.10.0",
-    "@xterm/addon-unicode11": "^0.8.0"
+    "@xterm/addon-unicode11": "^0.8.0",
+    "electron-chrome-web-store": "^0.13.0"
   },
   "author": "GX Lite"
 }

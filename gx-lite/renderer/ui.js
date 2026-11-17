@@ -15,6 +15,9 @@
     chevron: '<path d="M6 9l6 6 6-6"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
     terminal: '<path d="M4 17l6-6-6-6M12 19h8"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
+    puzzle: '<path d="M4 8h5a2 2 0 1 1 4 0h5v5a2 2 0 1 1 0 4v3H4z"/>',
     cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
     list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
     sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/>'
@@ -41,7 +44,7 @@
   const setIcon = (sel, n) => { $(sel).innerHTML = svg(n); };
   setIcon('#btn-newtab', 'plus'); setIcon('#btn-tabsearch', 'chevron');
   setIcon('#btn-back', 'back'); setIcon('#btn-fwd', 'fwd'); setIcon('#btn-star', 'star');
-  setIcon('#btn-sbsettings', 'sliders'); setIcon('#btn-console', 'list'); setIcon('#btn-terminal', 'terminal'); setIcon('#btn-memory', 'cpu'); setIcon('#btn-summarize', 'sparkle'); setIcon('#btn-shield', 'shield'); setIcon('#btn-settings', 'gear');
+  setIcon('#btn-sbsettings', 'sliders'); setIcon('#btn-console', 'list'); setIcon('#btn-terminal', 'terminal'); setIcon('#btn-memory', 'cpu'); setIcon('#btn-ext', 'puzzle'); setIcon('#btn-history', 'clock'); setIcon('#btn-passwords', 'key'); setIcon('#btn-summarize', 'sparkle'); setIcon('#btn-shield', 'shield'); setIcon('#btn-settings', 'gear');
   setIcon('#find-prev', 'back'); setIcon('#find-next', 'fwd'); setIcon('#find-close', 'x');
   $('#find-prev').firstChild.style.transform = 'rotate(90deg)';
   $('#find-next').firstChild.style.transform = 'rotate(90deg)';
@@ -56,6 +59,15 @@
     $('#btn-terminal').classList.toggle('active', S.activePanel === 'terminal');
     $('#btn-memory').classList.toggle('active', S.activePanel === 'memory');
     renderUpdate();
+    renderProfile();
+  }
+
+  function renderProfile() {
+    const b = $('#btn-profile'), p = S.profile;
+    if (!p) return;
+    b.textContent = p.initial;
+    b.style.background = p.color;
+    b.title = `${p.name} (profile)`;
   }
 
   function renderUpdate() {
@@ -68,6 +80,8 @@
     b.className = ['ready', 'available', 'manual', 'downloading', 'installing'].includes(u.state) ? 'hot' : '';
     b.title = u.state === 'ready' ? `Version ${u.version} is downloaded. Click to restart and install` : u.state === 'manual' ? 'Open the download page' : '';
   }
+  $('#btn-ext').onclick = () => { const r = $('#btn-ext').getBoundingClientRect(); gx.extMenu({ x: r.x, y: r.y, width: r.width, height: r.height }); };
+  $('#btn-profile').onclick = () => { const r = $('#btn-profile').getBoundingClientRect(); gx.profileMenu({ x: r.x, y: r.y, width: r.width, height: r.height }); };
   $('#btn-update').onclick = () => { const u = S && S.update; if (u?.state === 'ready' || u?.state === 'available') gx.installUpdate(); else if (u?.state === 'manual') gx.openUpdate(); };
 
   function textOn(hex) {
@@ -122,9 +136,12 @@
     const el = $('#bookmarks');
     el.hidden = !S.settings.showBookmarksBar;
     if (el.hidden) return;
-    el.innerHTML = S.bookmarks.length ? S.bookmarks.map((b) =>
+    const groups = (S.savedGroups || []).map((g) =>
+      `<div class="sg${g.open ? ' open' : ''}" data-sid="${esc(g.sid)}" style="--gc:${esc(g.color)};--gt:${textOn(g.color)}" title="${g.open ? 'Open tab group' : 'Saved tab group. Click to reopen'} (${g.count} tab${g.count === 1 ? '' : 's'})"><i></i><span>${esc(g.name)}</span></div>`).join('');
+    const marks = S.bookmarks.length ? S.bookmarks.map((b) =>
       `<div class="bm" data-id="${esc(b.id)}" title="${esc(b.url)}">${b.favicon ? `<img class="fav${/github\.com/.test(b.url) ? ' light' : ''}" src="${esc(b.favicon)}" alt="">` : '<span class="fav ph"></span>'}<span>${esc(b.title)}</span></div>`).join('')
       : '<span class="bm-empty">Star a page to add it here</span>';
+    el.innerHTML = groups + (groups && S.bookmarks.length ? '<div class="sgsep"></div>' : '') + marks;
   }
 
   // ---------- tabs ----------
@@ -258,6 +275,8 @@
   $('#btn-console').onclick = () => gx.togglePanel('console');
   $('#btn-terminal').onclick = () => gx.togglePanel('terminal');
   $('#btn-memory').onclick = () => gx.togglePanel('memory');
+  $('#btn-history').onclick = () => gx.openPage('history');
+  $('#btn-passwords').onclick = () => gx.openPage('passwords');
   $('#btn-summarize').onclick = () => gx.summarize();
   $('#btn-shield').onclick = () => gx.toggleAdBlock();
   $('#btn-sbsettings').onclick = () => gx.openSettings('sidebar');
@@ -296,9 +315,9 @@
   $('#btn-star').onclick = () => gx.toggleBookmark();
 
   // ---------- bookmarks bar ----------
-  $('#bookmarks').addEventListener('click', (e) => { const b = e.target.closest('.bm'); if (b) gx.openBookmark(b.dataset.id, e.metaKey || e.ctrlKey); });
+  $('#bookmarks').addEventListener('click', (e) => { const g = e.target.closest('.sg'); if (g) { gx.openGroup(g.dataset.sid); return; } const b = e.target.closest('.bm'); if (b) gx.openBookmark(b.dataset.id, e.metaKey || e.ctrlKey); });
   $('#bookmarks').addEventListener('auxclick', (e) => { if (e.button === 1) { const b = e.target.closest('.bm'); if (b) gx.openBookmark(b.dataset.id, true); } });
-  $('#bookmarks').addEventListener('contextmenu', (e) => { e.preventDefault(); const b = e.target.closest('.bm'); if (b) gx.bookmarkMenu(b.dataset.id); });
+  $('#bookmarks').addEventListener('contextmenu', (e) => { e.preventDefault(); const g = e.target.closest('.sg'); if (g) { gx.groupChipMenu(g.dataset.sid); return; } const b = e.target.closest('.bm'); if (b) gx.bookmarkMenu(b.dataset.id); });
 
   // ---------- find in page ----------
   const fi = $('#find-input');

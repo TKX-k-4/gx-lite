@@ -113,3 +113,13 @@ svg{width:16px;height:16px;display:block}
 #sidebar{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 #sidebar::-webkit-scrollbar{display:none}
 .sb-btn{flex:none}
+
+.avatar{width:28px;height:28px;flex:none;margin-left:4px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:12.5px}
+.avatar:hover{filter:brightness(1.12)}
+.sg{display:flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:11px;border:1px solid var(--gc);color:var(--text);white-space:nowrap;flex:none;cursor:default;max-width:170px}
+.sg i{width:8px;height:8px;border-radius:50%;background:var(--gc);flex:none}
+.sg span{overflow:hidden;text-overflow:ellipsis}
+.sg.open{background:var(--gc);color:var(--gt,#fff)}
+.sg.open i{background:currentColor;opacity:.7}
+.sg:hover{filter:brightness(1.15)}
+.sgsep{width:1px;height:16px;background:var(--line);margin:0 6px;flex:none}

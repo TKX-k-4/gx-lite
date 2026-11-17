@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Authenticator</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="pg">
+  <h1>Authenticator</h1>
+  <p class="warn" id="warn" hidden>Secure storage is not available on this computer, so accounts cannot be saved.</p>
+  <section class="card">
+    <p class="sub">Shows the 6-digit codes for sites that use two-step verification. The secrets are encrypted the same way as your passwords. When a site asks for a code, click its code box and choose the account.</p>
+    <div id="list"></div>
+  </section>
+  <section class="card">
+    <h2>Add an account</h2>
+    <p class="sub">On the site's two-step setup page choose "can't scan the code" to see the secret key, or paste the otpauth:// link if it shows one.</p>
+    <form id="form" class="edit">
+      <input id="uri" class="txt" placeholder="otpauth:// link (optional)" spellcheck="false" autocomplete="off">
+      <div class="bar"><input id="issuer" class="txt" placeholder="Service, like GitHub" autocomplete="off"><input id="account" class="txt" placeholder="Account, like you@example.com" autocomplete="off"></div>
+      <div class="bar"><input id="secret" class="txt" type="password" placeholder="Secret key" spellcheck="false" autocomplete="new-password"><input id="site" class="txt" placeholder="Website, like github.com (helps autofill)" spellcheck="false" autocomplete="off"></div>
+      <div class="bar"><button class="btn primary" type="submit">Add</button><span class="msg" id="msg"></span></div>
+    </form>
+  </section>
+</div>
+<script src="authenticator.js"></script>
+</body>
+</html>

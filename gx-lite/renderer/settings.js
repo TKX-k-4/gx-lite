@@ -10,12 +10,39 @@
     $('#suggest').checked = S.searchSuggest !== false;
     $('#unload').value = String(S.unloadMinutes ?? 5);
     $('#termoc').checked = S.terminalOpencode !== false;
+    $('#freeze').checked = !!S.freezeTabs;
+    $('#savepw').checked = S.savePasswords !== false;
+    $('#fillpw').checked = S.autofillPasswords !== false;
+    $('#fillprof').checked = S.autofillProfile !== false;
+    $('#savehist').checked = S.saveHistory !== false;
+    $('#spell').checked = S.spellcheck !== false;
     $('#lowmem').checked = !!S.lowMemory;
     $('#aiModel').value = S.aiModel || 'claude-haiku-5-5';
     document.querySelectorAll('[data-app]').forEach((el) => { el.checked = !!(S.sidebarApps || {})[el.dataset.app]; });
   }
   $('#accent').addEventListener('input', (e) => window.gx.setSettings({ accent: e.target.value }));
   $('#panelMode').onchange = (e) => window.gx.setSettings({ panelMode: e.target.value });
+  $('#savepw').onchange = (e) => window.gx.setSettings({ savePasswords: e.target.checked });
+  $('#fillpw').onchange = (e) => window.gx.setSettings({ autofillPasswords: e.target.checked });
+  $('#fillprof').onchange = (e) => window.gx.setSettings({ autofillProfile: e.target.checked });
+  $('#savehist').onchange = (e) => window.gx.setSettings({ saveHistory: e.target.checked });
+  $('#open-ext').onclick = () => window.gx.openPage('extensions');
+  $('#open-prof').onclick = () => window.gx.openPage('profiles');
+  async function defRefresh() {
+    const st = await window.gx.defaultStatus();
+    if (!st) return;
+    $('#def-btn').textContent = st.platform === 'win32' ? 'Open Windows default apps' : 'Make GX Lite my default browser';
+    $('#def-status').textContent = !st.packaged ? 'Available in the installed app, not when started with npm start.'
+      : st.platform === 'win32' ? 'Windows lets you choose the default yourself. Click the button, then pick GX Lite under Web browser.'
+      : st.isDefault ? 'GX Lite is your default browser.' : 'GX Lite is not your default browser. macOS will ask you to confirm.';
+  }
+  $('#def-btn').onclick = async () => { const r = await window.gx.defaultSet(); if (r && r.error) $('#def-status').textContent = r.error; else await defRefresh(); };
+  defRefresh();
+  $('#open-auth').onclick = () => window.gx.openPage('authenticator');
+  $('#open-pw').onclick = () => window.gx.openPage('passwords');
+  $('#open-hist').onclick = () => window.gx.openPage('history');
+  $('#freeze').onchange = (e) => window.gx.setSettings({ freezeTabs: e.target.checked });
+  $('#spell').onchange = (e) => window.gx.setSettings({ spellcheck: e.target.checked });
   $('#termoc').onchange = (e) => window.gx.setSettings({ terminalOpencode: e.target.checked });
   $('#unload').onchange = (e) => window.gx.setSettings({ unloadMinutes: +e.target.value });
   $('#lowmem').onchange = (e) => window.gx.setSettings({ lowMemory: e.target.checked });

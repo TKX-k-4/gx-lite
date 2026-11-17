@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<link rel="stylesheet" href="fonts.css">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#0e1424;color:#e8eefc;font:12.5px "Source Code Pro Variable","Source Code Pro",ui-monospace,Menlo,Consolas,monospace;user-select:none}
+.box{box-sizing:border-box;height:100%;display:flex;flex-direction:column;border:1px solid #1f2b4a}
+h1{margin:0;padding:12px 14px 8px;font-size:13px;font-weight:600}
+#list{flex:1;overflow:auto;padding:0 6px}
+.row{display:flex;align-items:center;gap:10px;height:46px;padding:0 8px;border-radius:8px;cursor:pointer}
+.row:hover{background:#16203a}
+.ico{width:26px;height:26px;border-radius:6px;background:#16203a;display:grid;place-items:center;font-weight:600;flex:none;object-fit:contain}
+.nm{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sub{display:block;color:#8191b5;font-size:11px;margin-top:2px}
+.opt{border:1px solid #1f2b4a;background:none;color:#8191b5;border-radius:6px;font:inherit;font-size:11px;padding:2px 8px;cursor:pointer}
+.opt:hover{color:#fff;border-color:#3b82f6}
+.empty{padding:14px 10px;color:#8191b5;line-height:1.5}
+.foot{border-top:1px solid #1f2b4a;padding:6px}
+.foot button{display:block;width:100%;text-align:left;border:0;background:none;color:#e8eefc;font:inherit;padding:9px 10px;border-radius:8px;cursor:pointer}
+.foot button:hover{background:#16203a}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Extensions</h1>
+  <div id="list"></div>
+  <div class="foot">
+    <button id="manage">Manage extensions</button>
+    <button id="store">Open the Chrome Web Store</button>
+  </div>
+</div>
+<script src="extmenu.js"></script>
+</body>
+</html>

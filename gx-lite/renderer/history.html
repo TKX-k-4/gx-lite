@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>History</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="pg">
+  <h1>History</h1>
+  <section class="card">
+    <div class="bar">
+      <input id="q" class="txt" placeholder="Search history" spellcheck="false" autocomplete="off">
+      <select id="range" class="sel">
+        <option value="hour">Last hour</option>
+        <option value="day">Last 24 hours</option>
+        <option value="week">Last 7 days</option>
+        <option value="all">All time</option>
+      </select>
+      <button class="btn" id="clear">Clear history</button>
+    </div>
+    <div id="list"></div>
+    <div class="msg" id="msg"></div>
+  </section>
+</div>
+<script src="history.js"></script>
+</body>
+</html>

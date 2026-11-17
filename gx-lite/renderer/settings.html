@@ -27,10 +27,24 @@
     <div class="row"><span>GitHub</span><input type="checkbox" class="tg" data-app="github"></div>
     <div class="row"><span>Spotify</span><input type="checkbox" class="tg" data-app="spotify"></div>
   </section>
+  <section id="default">
+    <h2>Default browser</h2>
+    <div class="row"><div><div>Make GX Lite your default browser</div><div class="sub" id="def-status">Checking…</div></div><button class="btn" id="def-btn">Set as default</button></div>
+  </section>
   <section id="perf">
     <h2>Performance</h2>
     <div class="row"><div><div>Unload idle tabs after</div><div class="sub">Background tabs you have not looked at free their memory and reload when you click them. Tabs playing audio are never unloaded.</div></div><select id="unload" class="sel"><option value="1">1 minute</option><option value="2">2 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="0">Never</option></select></div>
     <div class="row"><div><div>Low-memory mode (experimental)</div><div class="sub">Shares processes between tabs and turns on Chromium's low-end mode. Uses less memory but may feel less smooth. Restart the browser after changing it.</div></div><input type="checkbox" class="tg" id="lowmem"></div>
+    <div class="row"><div><div>Freeze background tabs (experimental)</div><div class="sub">After 30 seconds out of view, a tab keeps its place but stops running scripts, which saves CPU and battery. Tabs playing audio are never frozen. Pages that rely on live connections may reconnect when you return.</div></div><input type="checkbox" class="tg" id="freeze"></div>
+    <div class="row"><div><div>Spell check</div><div class="sub">Underlines misspelled words in text boxes. Turning it off saves a little memory. Applies to tabs opened afterwards.</div></div><input type="checkbox" class="tg" id="spell"></div>
+  </section>
+  <section id="passwords">
+    <h2>Passwords, autofill and history</h2>
+    <div class="row"><div><div>Offer to save passwords</div><div class="sub">Saved passwords are encrypted with your computer's key store (macOS Keychain, Windows data protection).</div></div><input type="checkbox" class="tg" id="savepw"></div>
+    <div class="row"><div><div>Autofill saved passwords</div><div class="sub">Shows your saved logins under a login box. Nothing is filled until you click one.</div></div><input type="checkbox" class="tg" id="fillpw"></div>
+    <div class="row"><div><div>Autofill saved addresses and info</div><div class="sub">Fills name, email, phone and address when you click a matching form field.</div></div><input type="checkbox" class="tg" id="fillprof"></div>
+    <div class="row"><div><div>Save browsing history</div><div class="sub">Used for the history page and address bar suggestions.</div></div><input type="checkbox" class="tg" id="savehist"></div>
+    <div class="row"><span>Manage</span><div><button class="btn" id="open-pw">Passwords</button> <button class="btn" id="open-auth">Authenticator</button> <button class="btn" id="open-hist">History</button></div></div>
   </section>
   <section id="terminal">
     <h2>Terminal</h2>
@@ -49,8 +63,9 @@
     <div class="msg" id="msg" style="padding:0 0 12px"></div>
   </section>
   <section>
-    <h2>Extensions</h2>
-    <div class="row"><div><div>Not supported</div><div class="sub">GX Lite leaves extension support out on purpose to stay small and fast.</div></div></div>
+    <h2>Extensions and profiles</h2>
+    <div class="row"><div><div>Chrome Web Store extensions</div><div class="sub">Install extensions from the Chrome Web Store. Support is partial, so some extensions will not work.</div></div><button class="btn" id="open-ext">Extensions</button></div>
+    <div class="row"><div><div>Profiles</div><div class="sub">Separate logins, tabs, groups and settings for each person or purpose.</div></div><button class="btn" id="open-prof">Profiles</button></div>
   </section>
 </div>
 <script src="settings.js"></script>
