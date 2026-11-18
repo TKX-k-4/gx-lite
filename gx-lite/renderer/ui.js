@@ -17,12 +17,18 @@
     terminal: '<path d="M4 17l6-6-6-6M12 19h8"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
-    puzzle: '<path d="M4 8h5a2 2 0 1 1 4 0h5v5a2 2 0 1 1 0 4v3H4z"/>',
+    puzzle: '<path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-2 .9-2 2v3.8h1.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>',
     cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
     list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    tlx: '<path d="M6 6l12 12M18 6L6 18"/>',
+    tlmin: '<path d="M5 12h14"/>',
+    tlfsx: '<path d="M10 14H5m5 0v5m0-5L4 20M14 10h5m-5 0V5m0 5l6-6"/>',
+    tlfs: '<path d="M5 19V9m0 10h10M19 5v10m0-10H9"/>',
+    download: '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>',
     sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/>'
   };
-  const svg = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
+  const FILLED = new Set(['download', 'puzzle']);   // Google Material glyphs are solid shapes, the rest are outlines
+  const svg = (n) => FILLED.has(n) ? `<svg viewBox="0 0 24 24" fill="currentColor">${ICON[n]}</svg>` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
   const APPS = [
     { id: 'discord', label: 'Discord', glyph: 'D', color: '#5865f2' },
     { id: 'youtube', label: 'YouTube', glyph: '▶', color: '#e5283f' },
@@ -42,9 +48,14 @@
 
   // static icons
   const setIcon = (sel, n) => { $(sel).innerHTML = svg(n); };
+  setIcon('#btn-downloads', 'download');
   setIcon('#btn-newtab', 'plus'); setIcon('#btn-tabsearch', 'chevron');
   setIcon('#btn-back', 'back'); setIcon('#btn-fwd', 'fwd'); setIcon('#btn-star', 'star');
   setIcon('#btn-sbsettings', 'sliders'); setIcon('#btn-console', 'list'); setIcon('#btn-terminal', 'terminal'); setIcon('#btn-memory', 'cpu'); setIcon('#btn-ext', 'puzzle'); setIcon('#btn-history', 'clock'); setIcon('#btn-passwords', 'key'); setIcon('#btn-summarize', 'sparkle'); setIcon('#btn-shield', 'shield'); setIcon('#btn-settings', 'gear');
+  // Mac-style window buttons, top right: red closes, yellow minimizes, green toggles full screen
+  $('#winctl').innerHTML = [['close', 'Close', 'tlx'], ['min', 'Minimize', 'tlmin'], ['fs', 'Full screen', 'tlfs']]
+    .map(([a, t, i]) => `<button class="tl tl-${a === 'min' ? 'min' : a === 'fs' ? 'fs' : 'close'}" data-a="${a}" title="${t}" aria-label="${t}">${svg(i)}</button>`).join('');
+  $('#winctl').onclick = (e) => { const b = e.target.closest('.tl'); if (b) gx.winCtl(b.dataset.a); };
   setIcon('#find-prev', 'back'); setIcon('#find-next', 'fwd'); setIcon('#find-close', 'x');
   $('#find-prev').firstChild.style.transform = 'rotate(90deg)';
   $('#find-next').firstChild.style.transform = 'rotate(90deg)';
@@ -54,6 +65,9 @@
     if (!S) return;
     document.documentElement.style.setProperty('--accent', S.settings.accent);
     if (!renaming && !dragging) renderTabs();
+    renderDownloads();
+    renderUpdateModal();
+    renderFsButton();
     renderWs(); renderApps(); renderToolbar(); renderBookmarks();
     $('#btn-console').classList.toggle('active', S.activePanel === 'console');
     $('#btn-terminal').classList.toggle('active', S.activePanel === 'terminal');
@@ -80,9 +94,65 @@
     b.className = ['ready', 'available', 'manual', 'downloading', 'installing'].includes(u.state) ? 'hot' : '';
     b.title = u.state === 'ready' ? `Version ${u.version} is downloaded. Click to restart and install` : u.state === 'manual' ? 'Open the download page' : '';
   }
+  const dlRect = () => { const r = $('#btn-downloads').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; };
+  $('#btn-downloads').onclick = () => gx.downloadsMenu(dlRect());
+  function renderDownloads() {
+    const b = $('#btn-downloads'), d = S.downloads || { active: 0, percent: -1 };
+    if (d.active) { b.dataset.active = '1'; b.dataset.p = d.percent < 0 ? '-1' : String(d.percent); b.style.setProperty('--p', Math.max(0, d.percent) + '%'); b.title = `Downloading ${d.active} file${d.active > 1 ? 's' : ''}` + (d.percent >= 0 ? ` (${d.percent}%)` : ''); }
+    else { delete b.dataset.active; delete b.dataset.p; b.title = 'Downloads'; }
+    gx.downloadsRect(dlRect());
+  }
   $('#btn-ext').onclick = () => { const r = $('#btn-ext').getBoundingClientRect(); gx.extMenu({ x: r.x, y: r.y, width: r.width, height: r.height }); };
   $('#btn-profile').onclick = () => { const r = $('#btn-profile').getBoundingClientRect(); gx.profileMenu({ x: r.x, y: r.y, width: r.width, height: r.height }); };
-  $('#btn-update').onclick = () => { const u = S && S.update; if (u?.state === 'ready' || u?.state === 'available') gx.installUpdate(); else if (u?.state === 'manual') gx.openUpdate(); };
+  $('#btn-update').onclick = () => {
+    const u = S && S.update;
+    if (u?.state === 'available' || u?.state === 'downloading' || u?.state === 'installing') { updDismissed = null; updOpen = true; renderUpdateModal(); }
+    else if (u?.state === 'ready') gx.installUpdate();
+    else if (u?.state === 'manual') gx.openUpdate();
+  };
+
+  // ---------- update dialog (accent colored; Update downloads it, then GX Lite relaunches by itself) ----------
+  let updOpen = false, updDismissed = null;
+  function setUpdOpen(b) {
+    if (b === updOpen) return;
+    updOpen = b; $('#updmodal').hidden = !b;
+    if ($('#tabsearch').hidden) gx.overlay(b);   // hides the page views so the dialog is visible
+  }
+  function renderUpdateModal() {
+    const u = S && S.update;
+    const st = u && u.state;
+    if (!updOpen && st === 'available' && u.version !== updDismissed) setUpdOpen(true);
+    if (updOpen && !['available', 'downloading', 'installing', 'error', 'manual'].includes(st)) { setUpdOpen(false); return; }
+    if (!updOpen) return;
+    const notes = $('#upd-notes'), prog = $('#upd-prog'), bar = $('#upd-bar'), status = $('#upd-status'), go = $('#upd-go'), later = $('#upd-later');
+    $('#upd-new').textContent = u.version ? 'v' + u.version : '';
+    $('#upd-cur').textContent = S.currentVersion ? `you have v${S.currentVersion}` : '';
+    const showNotes = (st === 'available' || st === 'manual') && !!u.notes;
+    notes.hidden = !showNotes; if (showNotes) notes.textContent = u.notes;
+    prog.hidden = !(st === 'downloading' || st === 'installing');
+    prog.classList.toggle('ind', st === 'installing' || (st === 'downloading' && !u.percent));
+    bar.style.width = st === 'downloading' ? (u.percent || 0) + '%' : '';
+    later.hidden = !(st === 'available' || st === 'manual' || st === 'error');
+    go.hidden = st === 'downloading' || st === 'installing';
+    if (st === 'available') { $('#upd-title').textContent = 'Update available'; status.textContent = 'GX Lite will download the update and relaunch by itself when it is done.'; go.textContent = 'Update'; later.textContent = 'Later'; }
+    else if (st === 'manual') { $('#upd-title').textContent = 'Update available'; status.textContent = 'This version has to be installed from the download page.'; go.textContent = 'Open download page'; later.textContent = 'Later'; }
+    else if (st === 'downloading') { $('#upd-title').textContent = 'Downloading update'; status.textContent = (u.percent || 0) + '%'; }
+    else if (st === 'installing') { $('#upd-title').textContent = 'Relaunching'; status.textContent = 'The update is ready. GX Lite is restarting and will bring your tabs back.'; }
+    else if (st === 'error') { $('#upd-title').textContent = 'Update failed'; status.textContent = u.message || 'Something went wrong. Try again in a moment.'; go.hidden = true; later.textContent = 'Close'; }
+  }
+  $('#upd-go').onclick = () => { const u = S && S.update; if (u?.state === 'manual') gx.openUpdate(); else gx.installUpdate(); };
+  $('#upd-later').onclick = () => { if (S && S.update) updDismissed = S.update.version; setUpdOpen(false); };
+  $('#updmodal').addEventListener('mousedown', (e) => { if (e.target.id === 'updmodal' && S?.update?.state !== 'downloading' && S?.update?.state !== 'installing') { if (S?.update) updDismissed = S.update.version; setUpdOpen(false); } });
+
+  // green button: shows "exit" arrows while the window is full screen
+  let lastFs = null;
+  function renderFsButton() {
+    const f = !!S.fullscreen;
+    if (f === lastFs) return;
+    lastFs = f;
+    const b = document.querySelector('.tl-fs');
+    if (b) { b.innerHTML = svg(f ? 'tlfsx' : 'tlfs'); b.title = f ? 'Exit full screen' : 'Full screen'; }
+  }
 
   function textOn(hex) {
     const n = parseInt(hex.slice(1), 16);
@@ -367,6 +437,7 @@
   gx.onCmd((c, a) => {
     if (c === 'find') openFind();
     else if (c === 'tabsearch') openTS();
+    else if (c === 'downloads') gx.downloadsMenu(dlRect());
     else if (c === 'focus-address') { addr.focus(); addr.select(); }
     else if (c === 'omni-commit') { addr.value = a; gx.go(a, null); setMode(null); addr.blur(); }
     else if (c === 'rename-group') setTimeout(() => { const chip = document.querySelector(`.group-chip[data-g="${a}"]`); if (chip) startRename(chip); }, 80);

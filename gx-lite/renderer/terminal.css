@@ -10,7 +10,7 @@ body{display:flex;flex-direction:column;font:13px -apple-system,BlinkMacSystemFo
 .red:hover{filter:brightness(.85)}
 .ttl{max-width:58vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#d6d6d6;font-weight:500}
 .acts{display:flex;justify-self:end;gap:4px}
-.acts button{padding:2px 8px;border:0;border-radius:5px;background:none;color:#a8a8a8;font:inherit;font-size:12px;cursor:pointer}
+.acts button{padding:3px 10px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:none;color:#a8a8a8;font:inherit;font-size:12px;cursor:pointer}
 .acts button:hover{background:rgba(255,255,255,.12);color:#fff}
 #term{flex:1;min-height:0;padding:6px 0 0 8px;background:#000;overflow:hidden}
 .xterm-viewport{background:#000!important}

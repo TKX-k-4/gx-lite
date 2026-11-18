@@ -17,7 +17,7 @@
     $('#savehist').checked = S.saveHistory !== false;
     $('#spell').checked = S.spellcheck !== false;
     $('#lowmem').checked = !!S.lowMemory;
-    $('#aiModel').value = S.aiModel || 'claude-haiku-5-5';
+    $('#aiModel').value = S.aiModel === 'gemini-3.5-flash-lite' ? 'gemini-3.5-flash-lite' : 'gemini-3.8-flash';
     document.querySelectorAll('[data-app]').forEach((el) => { el.checked = !!(S.sidebarApps || {})[el.dataset.app]; });
   }
   $('#accent').addEventListener('input', (e) => window.gx.setSettings({ accent: e.target.value }));

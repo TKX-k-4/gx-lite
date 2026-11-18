@@ -47,7 +47,10 @@ Updates are skipped when running with `npm start`.
 
 ## More features
 - **Address bar suggestions:** bookmarks, history and Google suggestions appear as you type (turn Google suggestions off in Settings > Privacy).
-- **Page summarizer:** sparkle button in the address bar (Ctrl/Cmd+Shift+Y). Needs your own Anthropic API key in Settings.
+- **Page summarizer (Gemini):** sparkle button in the address bar (Ctrl/Cmd+Shift+Y). Needs your own free Gemini API key in Settings. The box in the panel can also ask Gemini to click buttons on the page; you approve each click.
+- **Downloads:** Chrome-style menu on the toolbar (Ctrl+J, Cmd+Shift+J on Mac). Always asks where to save.
+- **Window buttons:** red/yellow/green at the top right (close, minimize, full screen).
+- **Sign-in popups** open as a tab, not a window.
 - **Terminal:** sidebar button (Ctrl+`). Install opencode first with `npm i -g opencode-ai`, then press "Run opencode".
 
 ## Performance

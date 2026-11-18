@@ -9,7 +9,6 @@
 </head>
 <body>
 <header id="topbar">
-  <div id="lights"></div>
   <div id="tabs"></div>
   <button class="icon-btn" id="btn-newtab" title="New tab"></button>
   <button class="icon-btn" id="btn-tabsearch" title="Search tabs"></button>
@@ -42,6 +41,7 @@
         <button class="icon-btn" id="btn-star" title="Bookmark this page"></button>
       </div>
       <button class="icon-btn" id="btn-summarize" title="Summarize this page (Ctrl/Cmd+Shift+Y)"></button>
+      <button class="icon-btn" id="btn-downloads" title="Downloads"></button>
       <button class="icon-btn" id="btn-ext" title="Extensions"></button>
       <button id="btn-profile" class="avatar" title="Profile"></button>
       <button id="btn-update" hidden></button>
@@ -56,6 +56,18 @@
     </div>
     <div id="content"></div>
   </main>
+</div>
+<div id="updmodal" hidden>
+  <div class="upd-card" role="dialog" aria-modal="true" aria-labelledby="upd-title">
+    <div class="upd-head"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><b id="upd-title">Update available</b></div>
+    <div class="upd-body">
+      <div class="upd-ver"><span class="new" id="upd-new"></span><span class="cur" id="upd-cur"></span></div>
+      <div class="upd-notes" id="upd-notes" hidden></div>
+      <div class="upd-prog" id="upd-prog" hidden><i id="upd-bar"></i></div>
+      <div class="upd-status" id="upd-status"></div>
+    </div>
+    <div class="upd-actions"><button class="upd-btn" id="upd-later">Later</button><button class="upd-btn primary" id="upd-go">Update</button></div>
+  </div>
 </div>
 <div id="tabsearch" hidden>
   <div class="ts-box">
