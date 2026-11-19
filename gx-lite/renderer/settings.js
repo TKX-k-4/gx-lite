@@ -57,6 +57,7 @@
     if (r.ok) $('#ai-key').value = '';
     await aiRefresh();
     if (!r.ok) $('#ai-status').textContent = r.error || 'Could not save the key.';
+    else $('#ai-status').textContent = r.note || 'Key saved and checked. It works.';
   };
   $('#ai-clear').onclick = async () => { await window.gx.clearApiKey(); await aiRefresh(); };
   aiRefresh();

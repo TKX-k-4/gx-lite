@@ -10,7 +10,7 @@ if (process.platform === 'darwin') {
 }
 
 // Only our own pages (new tab, settings) get an API.
-if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console|summary|terminal|memory|history|passwords|profiles|extensions|authenticator)\.html$/.test(location.pathname)) {
+if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console|terminal|memory|history|passwords|profiles|extensions|authenticator)\.html$/.test(location.pathname)) {
   contextBridge.exposeInMainWorld('gx', {
     getBookmarks: () => ipcRenderer.invoke('bookmarks:get'),
     getSettings: () => ipcRenderer.invoke('settings:get'),
@@ -60,12 +60,6 @@ if (location.protocol === 'file:' && /\/renderer\/(newtab|settings|console|summa
     unloadTab: (id) => ipcRenderer.send('mem:unload', id),
     unloadPanel: (id) => ipcRenderer.send('mem:unload-panel', id),
     unloadAll: () => ipcRenderer.send('mem:unload-all'),
-    getSummary: () => ipcRenderer.invoke('summary:get'),
-    onSummary: (cb) => ipcRenderer.on('summary:update', (_e, st) => cb(st)),
-    runSummary: () => ipcRenderer.send('summary:run'),
-    summaryViaGemini: () => ipcRenderer.send('summary:via-gemini'),
-    askSummary: (q) => ipcRenderer.send('summary:ask', q),
-    confirmSummary: (ok) => ipcRenderer.send('summary:confirm', !!ok),
     closePanel: () => ipcRenderer.send('panel:close'),
     aiStatus: () => ipcRenderer.invoke('ai:status'),
     setApiKey: (k) => ipcRenderer.invoke('ai:set-key', k),

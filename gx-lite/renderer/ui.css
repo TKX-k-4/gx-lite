@@ -11,7 +11,7 @@ svg{width:16px;height:16px;display:block}
 /* top bar */
 #topbar{height:36px;flex:none;display:flex;align-items:flex-end;gap:2px;padding:0 6px;-webkit-app-region:drag}
 #topbar>*{-webkit-app-region:no-drag}
-#winctl{display:flex;align-items:center;gap:8px;flex:none;height:100%;padding:0 8px 0 10px}
+#winctl{display:flex;align-items:center;gap:8px;flex:none;height:100%;padding:0 10px 0 12px}
 .tl{width:12px;height:12px;border-radius:50%;border:.5px solid rgba(0,0,0,.28);padding:0;display:grid;place-items:center;color:rgba(0,0,0,.6);cursor:default}
 .tl svg{width:8px;height:8px;opacity:0;stroke-width:2.6}
 #winctl:hover .tl svg{opacity:1}

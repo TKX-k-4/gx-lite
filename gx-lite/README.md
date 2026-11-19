@@ -47,9 +47,9 @@ Updates are skipped when running with `npm start`.
 
 ## More features
 - **Address bar suggestions:** bookmarks, history and Google suggestions appear as you type (turn Google suggestions off in Settings > Privacy).
-- **Page summarizer (Gemini):** sparkle button in the address bar (Ctrl/Cmd+Shift+Y). Needs your own free Gemini API key in Settings. The box in the panel can also ask Gemini to click buttons on the page; you approve each click.
+- **AI assistant (Gemini):** sparkle button in the address bar (Ctrl/Cmd+Shift+Y) opens an overlay on the right side of the page, like Claude in Chrome. It summarizes the page, answers questions, and can click buttons after you approve each click. Needs your own free Gemini API key in Settings. If a model is busy it retries and falls back to the lighter model.
 - **Downloads:** Chrome-style menu on the toolbar (Ctrl+J, Cmd+Shift+J on Mac). Always asks where to save.
-- **Window buttons:** red/yellow/green at the top right (close, minimize, full screen).
+- **Window buttons:** red/yellow/green at the top left (close, minimize, full screen).
 - **Sign-in popups** open as a tab, not a window.
 - **Terminal:** sidebar button (Ctrl+`). Install opencode first with `npm i -g opencode-ai`, then press "Run opencode".
 

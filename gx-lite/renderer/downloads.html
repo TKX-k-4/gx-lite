@@ -10,7 +10,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0e1424;color:#e8eefc;
 h1{margin:0;padding:12px 14px 8px;font-size:13px;font-weight:600}
 #list{flex:1;overflow:auto;padding:0 6px}
 .row{display:flex;align-items:center;gap:10px;min-height:58px;padding:4px 8px;border-radius:8px}
-.row:hover{background:#16203a}
+.row{transition:background .08s}
+.row:hover{background:#1c2a4f;box-shadow:inset 0 0 0 1px #2c3f73}
+.ib{width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:none;color:#b7c4e6;cursor:pointer;padding:0}
+.ib:hover{background:#2c3f73;color:#fff}
+.ib svg{width:17px;height:17px;fill:currentColor}
+.row .ib{opacity:0}.row:hover .ib,.row:focus-within .ib{opacity:1}
 .ico{width:30px;height:30px;border-radius:7px;background:#16203a;display:grid;place-items:center;font-weight:600;font-size:10px;color:#8191b5;flex:none;text-transform:uppercase}
 .mid{flex:1;min-width:0}
 .nm{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
